@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/hadisBookFragment">
+
+    <fragment
+        android:id="@+id/hadisBookFragment"
+        android:name="com.towhid.hadis.HadisBookFragment"
+        android:label="fragment_hadis_book"
+        tools:layout="@layout/fragment_hadis_book">
+        <action
+            android:id="@+id/action_hadisBookFragment_to_hadisChapterFragment"
+            app:destination="@id/hadisChapterFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/hadisChapterFragment"
+        android:name="com.towhid.hadis.HadisChapterFragment"
+        android:label="fragment_hadis_chapter"
+        tools:layout="@layout/fragment_hadis_chapter">
+        <action
+            android:id="@+id/action_hadisChapterFragment_to_hadisListFragment"
+            app:destination="@id/hadisListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/hadisListFragment"
+        android:name="com.towhid.hadis.HadisListFragment"
+        android:label="fragment_hadis_list"
+        tools:layout="@layout/fragment_hadis_list" >
+        <action
+            android:id="@+id/action_hadisListFragment_to_hadisDetailsFragment"
+            app:destination="@id/hadisDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/hadisDetailsFragment"
+        android:name="com.towhid.hadis.HadisDetailsFragment"
+        android:label="fragment_hadis_details"
+        tools:layout="@layout/fragment_hadis_details" />
+</navigation>
