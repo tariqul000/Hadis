@@ -9,5 +9,44 @@
         android:id="@+id/hadisBookFragment"
         android:name="com.towhid.hadis.fragment.HadisBookFragment"
         android:label="fragment_hadis_book"
-        tools:layout="@layout/fragment_hadis_book"/>
+        tools:layout="@layout/fragment_hadis_book">
+        <action
+            android:id="@+id/action_hadisBookFragment_to_hadisChapterFragment"
+            app:destination="@id/hadisChapterFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/hadisChapterFragment"
+        android:name="com.towhid.hadis.fragment.HadisChapterFragment"
+        android:label="fragment_hadis_chapter"
+        tools:layout="@layout/fragment_hadis_chapter" >
+        <action
+            android:id="@+id/action_hadisChapterFragment_to_hadisListFragment"
+            app:destination="@id/hadisListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+    <fragment
+        android:id="@+id/hadisListFragment"
+        android:name="com.towhid.hadis.fragment.HadisListFragment"
+        android:label="fragment_hadis_list"
+        tools:layout="@layout/fragment_hadis_list" >
+        <action
+            android:id="@+id/action_hadisListFragment_to_hadisDetailsFragment"
+            app:destination="@id/hadisDetailsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+    <fragment
+        android:id="@+id/hadisDetailsFragment"
+        android:name="com.towhid.hadis.fragment.HadisDetailsFragment"
+        android:label="fragment_hadis_details"
+        tools:layout="@layout/fragment_hadis_details" />
 </navigation>

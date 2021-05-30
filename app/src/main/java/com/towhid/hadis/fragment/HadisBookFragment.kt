@@ -41,11 +41,28 @@ class HadisBookFragment : Fragment() {
             callHadisBook().observe(
                 activity as LifecycleOwner, { any ->
                     if (any is HadisBookRes) {
+                        var no = 0
                         any.data.forEach { it ->
+                            var enName = ""
+                            var arName = ""
                             it.collection.forEach {
-                                Log.d("pass", it.title)
-                                data.add(HadisBook(it.title))
+                                when (it.lang) {
+                                    "en" -> enName = it.title
+                                    "ar" -> arName = it.title
+                                }
                             }
+                            data.add(
+                                HadisBook(
+                                    ++no,
+                                    it.name,
+                                    it.hasBooks,
+                                    it.hasChapters,
+                                    enName,
+                                    arName,
+                                    it.totalHadith,
+                                    it.totalAvailableHadith
+                                )
+                            )
                         }
                         recyclerAdapterHadisBook.notifyDataSetChanged()
                     }

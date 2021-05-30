@@ -12,15 +12,55 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
 
-        <TextView
-            android:id="@+id/tv_hadis_book_name"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{itemlist.bookName}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_margin="8dp"
+            android:background="@drawable/shape_rec_item_back"
+            android:elevation="2dp"
+            android:translationZ="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/te_no"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_gradient"
+                android:gravity="center"
+                android:text="@{Integer.toString(itemlist.no)}"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="14" />
+
+            <TextView
+                android:id="@+id/tv_hadis_book_name_en"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/black"
+                android:text="@{itemlist.bookNameEn}"
+                app:layout_constraintLeft_toRightOf="@id/te_no"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Sahih al-Bukhari" />
+
+            <TextView
+                android:id="@+id/tv_hadis_book_name_ar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="@{itemlist.bookNameAr}"
+                app:layout_constraintLeft_toRightOf="@id/te_no"
+                app:layout_constraintTop_toBottomOf="@id/tv_hadis_book_name_en"
+                tools:text="صحيح البخاري" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
