@@ -25,9 +25,11 @@ class MainActivity : AppCompatActivity() {
         toolbar.setupWithNavController(navController, null)
         check.setOnClickListener {
             val action = HadisBookFragmentDirections.actionHadisBookFragmentToHadisChapterFragment()
-            val bundle= bundleOf("hadisName" to "bukhari")
-            navController.navigate(R.id.action_hadisBookFragment_to_hadisChapterFragment,bundle)
+            val bundle = bundleOf("hadisName" to "bukhari")
+            navController.navigate(R.id.action_hadisBookFragment_to_hadisChapterFragment, bundle)
         }
     }
+
+    fun hello(view: View, a: Int) {}
 
 }

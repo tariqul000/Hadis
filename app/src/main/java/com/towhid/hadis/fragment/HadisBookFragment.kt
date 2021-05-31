@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.towhid.hadis.R
 import com.towhid.hadis.adapter.RecyclerAdapterHadisBook
 import com.towhid.hadis.databinding.FragmentHadisBookBinding
+import com.towhid.hadis.databinding.ItemHadisBookBinding
 import com.towhid.hadis.model.HadisBook
 import com.towhid.hadis.network.model.response.hadis_book.HadisBookRes
 import com.towhid.hadis.viewModel.HadisBookViewModel
@@ -31,7 +32,7 @@ class HadisBookFragment : Fragment() {
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_hadis_book, container, false)
         hadisBookViewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
-        recyclerAdapterHadisBook = RecyclerAdapterHadisBook(data)
+        recyclerAdapterHadisBook = RecyclerAdapterHadisBook(requireContext(),data)
 
         binding.recHadisBook.layoutManager = LinearLayoutManager(context)
         binding.recHadisBook.adapter = recyclerAdapterHadisBook
