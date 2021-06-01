@@ -1,7 +1,8 @@
 package com.towhid.hadis.model
 
 data class HadisChapter(
-    var ChapterNumber: String,
+    var collectionName: String,
+    var BookNumber: String,
     var ChapterNameEn: String,
     var ChapterNameAr: String,
     var hadithStartNumber: Int,

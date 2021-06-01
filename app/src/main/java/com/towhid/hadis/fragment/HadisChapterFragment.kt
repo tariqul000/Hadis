@@ -5,62 +5,60 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.towhid.hadis.R
 import com.towhid.hadis.adapter.RecyclerAdapterHadisChapter
+import com.towhid.hadis.databinding.FragmentHadisChapterBinding
 import com.towhid.hadis.model.HadisChapter
 import com.towhid.hadis.network.model.response.hadis_chapter.HadisChapterRes
 import com.towhid.hadis.viewModel.HadisBookViewModel
 import kotlinx.android.synthetic.main.fragment_hadis_chapter.view.*
 
-private const val HADIS_NAME = "hadisName"
+private const val COLLECTION_NAME = "collectionName"
 
 class HadisChapterFragment : Fragment() {
-    private var hadisName: String? = null
-    var v: View? = null
+    private var collectionName: String? = null
 
-    lateinit var hadisChapters: MutableList<HadisChapter>
-    lateinit var recyclerAdapterHadisChapter: RecyclerAdapterHadisChapter
+    private lateinit var binding: FragmentHadisChapterBinding
     private lateinit var hadisBookViewModel: HadisBookViewModel
+    lateinit var recyclerAdapterHadisChapter: RecyclerAdapterHadisChapter
+    private var isAlreadyLoaded = false
 
-
-
+    private var hadisChapters = mutableListOf<HadisChapter>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            hadisName = it.getString(HADIS_NAME)
+            collectionName = it.getString(COLLECTION_NAME)
         }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        var view = inflater.inflate(R.layout.fragment_hadis_chapter, container, false)
-        init(view)
-        action(view)
-        return view
+    ): View {
+        if (!isAlreadyLoaded) {
+            isAlreadyLoaded = true
+            binding =
+                DataBindingUtil.inflate(inflater, R.layout.fragment_hadis_chapter, container, false)
+            init()
+            action()
+
+        }
+        return binding.root
     }
 
-    private fun init(view: View) {
-        v = view
-        hadisChapters = mutableListOf<HadisChapter>()
-        recyclerAdapterHadisChapter =
-            RecyclerAdapterHadisChapter(view.context, hadisChapters)
+    private fun init() {
         hadisBookViewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
-
+        recyclerAdapterHadisChapter = RecyclerAdapterHadisChapter(requireContext(), hadisChapters)
     }
 
-    private fun action(view: View) {
-
-        view.rec_hadis_chapter.apply {
-            layoutManager = LinearLayoutManager(view.context)
+    private fun action() {
+        binding.recHadisChapter.apply {
+            layoutManager = LinearLayoutManager(context)
             adapter = recyclerAdapterHadisChapter
         }
         chapterLoad()
@@ -68,7 +66,7 @@ class HadisChapterFragment : Fragment() {
 
     private fun chapterLoad() {
         with(hadisBookViewModel) {
-            callHadisChapter(hadisName!!).observe(
+            callHadisChapter(collectionName!!).observe(
                 activity as LifecycleOwner, { any ->
                     if (any is HadisChapterRes) {
                         any.data.forEach {
@@ -82,6 +80,7 @@ class HadisChapterFragment : Fragment() {
                             }
                             hadisChapters.add(
                                 HadisChapter(
+                                    collectionName!!,
                                     it.bookNumber,
                                     enName,
                                     arName,
@@ -100,10 +99,10 @@ class HadisChapterFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(hadisName: String) =
+        fun newInstance(collectionName: String) =
             HadisChapterFragment().apply {
                 arguments = Bundle().apply {
-                    putString(HADIS_NAME, hadisName)
+                    putString(COLLECTION_NAME, collectionName)
                 }
             }
     }

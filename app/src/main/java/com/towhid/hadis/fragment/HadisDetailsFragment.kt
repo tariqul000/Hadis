@@ -1,32 +1,35 @@
 package com.towhid.hadis.fragment
 
 import android.os.Bundle
+import android.text.Html
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.HtmlCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
 import com.towhid.hadis.R
+import com.towhid.hadis.network.model.response.hadis_details.HadisDetailRes
+import com.towhid.hadis.viewModel.HadisBookViewModel
+import kotlinx.android.synthetic.main.fragment_hadis_details.view.*
+import javax.inject.Inject
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+private const val COLLECTION_NAME = "collectionName"
+private const val HADITH_NUMBER = "hadithNumber"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [HadisDetailsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HadisDetailsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var collectionName: String? = null
+    private var hadithNumber: String? = null
+
+    @Inject
+    lateinit var hadisBookViewModel: HadisBookViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            collectionName = it.getString(COLLECTION_NAME)
+            hadithNumber = it.getString(HADITH_NUMBER)
         }
     }
 
@@ -34,26 +37,55 @@ class HadisDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_hadis_details, container, false)
+        var view = inflater.inflate(R.layout.fragment_hadis_details, container, false)
+        init()
+        action(view)
+        return view
     }
 
+    private fun init() {
+        hadisBookViewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
+    }
+
+    private fun action(view: View) {
+        detailsLoad(view)
+    }
+
+    private fun detailsLoad(view: View) {
+        with(hadisBookViewModel) {
+            callHadisDetail(collectionName!!, hadithNumber!!).observe(
+                activity as LifecycleOwner, { any ->
+                    if (any is HadisDetailRes) {
+                        any.hadith.forEach {
+                            when (it.lang) {
+                                "en" -> {
+                                    view.tv_title_en.text = HtmlCompat.fromHtml(it.chapterTitle,
+                                        HtmlCompat.FROM_HTML_MODE_LEGACY)
+                                    view.tv_description_en.text=HtmlCompat.fromHtml(it.body,
+                                        HtmlCompat.FROM_HTML_MODE_LEGACY)
+                                }
+                                "ar" -> {
+                                    view.tv_title_ar.text = HtmlCompat.fromHtml(it.chapterTitle,
+                                        HtmlCompat.FROM_HTML_MODE_LEGACY)
+                                    view.tv_description_ar.text=HtmlCompat.fromHtml(it.body,
+                                        HtmlCompat.FROM_HTML_MODE_LEGACY)
+                                }
+                            }
+
+                        }
+                    }
+                })
+        }
+    }
+
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HadisDetailsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(collectionName: String, hadithNumber: String) =
             HadisDetailsFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putString(COLLECTION_NAME, collectionName)
+                    putString(HADITH_NUMBER, hadithNumber)
                 }
             }
     }

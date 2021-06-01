@@ -10,8 +10,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.towhid.hadis.fragment.HadisBookFragment
 import com.towhid.hadis.fragment.HadisBookFragmentDirections
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,13 +25,7 @@ class MainActivity : AppCompatActivity() {
         }
         navController = Navigation.findNavController(this, R.id.navHostMainFragment)
         toolbar.setupWithNavController(navController, null)
-        check.setOnClickListener {
-            val action = HadisBookFragmentDirections.actionHadisBookFragmentToHadisChapterFragment()
-            val bundle = bundleOf("hadisName" to "bukhari")
-            navController.navigate(R.id.action_hadisBookFragment_to_hadisChapterFragment, bundle)
-        }
-    }
 
-    fun hello(view: View, a: Int) {}
+    }
 
 }
