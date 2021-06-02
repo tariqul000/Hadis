@@ -1,4 +1,4 @@
-package com.mocat.btb.network.api
+package com.towhid.hadis.network.api
 
 import com.towhid.hadis.network.model.response.hadis_book.HadisBookRes
 import com.towhid.hadis.network.model.response.hadis_chapter.HadisChapterRes

@@ -59,7 +59,6 @@ dependencies {
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     // LiveData
@@ -100,6 +99,33 @@ dependencies {
     implementation 'com.beust:klaxon:5.5'
     //eventbus
     implementation 'org.greenrobot:eventbus:3.2.0'
+
+
+
+    // Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:2.3.0"
+
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
+
+    // Coroutine Lifecycle Scopes
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
+
+    // Activity KTX for viewModels()
+    implementation "androidx.activity:activity-ktx:1.2.3"
+
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
+
+    // paging 3
+    implementation "androidx.paging:paging-runtime-ktx:3.0.0"
+
+    // Room
+    def room_version = "2.3.0-beta02"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
 
 }
 repositories {

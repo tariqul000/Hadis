@@ -2,9 +2,9 @@ package com.towhid.hadis.viewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.mocat.btb.network.api.RetrofitClient
 import com.towhid.hadis.listener.HadisClickListener
 import com.towhid.hadis.model.HadisBook
+import com.towhid.hadis.network.api.RetrofitClient
 import com.towhid.hadis.network.model.response.hadis_book.HadisBookRes
 import com.towhid.hadis.network.model.response.hadis_chapter.HadisChapterRes
 import com.towhid.hadis.network.model.response.hadis_details.HadisDetailRes
