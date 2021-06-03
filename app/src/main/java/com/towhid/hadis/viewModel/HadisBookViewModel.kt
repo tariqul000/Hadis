@@ -40,10 +40,10 @@ class HadisBookViewModel @Inject constructor() : ViewModel() {
         return resultLiveData
     }
 
-    fun callHadisChapter(collectionName: String): MutableLiveData<Any> {
+    fun callHadisChapter(collectionName: String,pageNumber: Int): MutableLiveData<Any> {
         val resultLiveData: MutableLiveData<Any> = MutableLiveData()
         val call: Call<HadisChapterRes> =
-            RetrofitClient.getInstance().getApi().HadisChapterRes_(collectionName)
+            RetrofitClient.getInstance().getApi().HadisChapterRes_(collectionName,pageNumber)
 
         call.enqueue(object : Callback<HadisChapterRes> {
             override fun onResponse(
@@ -63,10 +63,15 @@ class HadisBookViewModel @Inject constructor() : ViewModel() {
         return resultLiveData
     }
 
-    fun callHadisList(collectionName: String, bookNumber: String): MutableLiveData<Any> {
+    fun callHadisList(
+        collectionName: String,
+        bookNumber: String,
+        pageNumber: Int
+    ): MutableLiveData<Any> {
         val resultLiveData: MutableLiveData<Any> = MutableLiveData()
         val call: Call<HadisListRes> =
-            RetrofitClient.getInstance().getApi().HadisListRes_(collectionName, bookNumber)
+            RetrofitClient.getInstance().getApi()
+                .HadisListRes_(collectionName, bookNumber, pageNumber)
 
         call.enqueue(object : Callback<HadisListRes> {
             override fun onResponse(

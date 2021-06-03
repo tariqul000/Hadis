@@ -1,25 +1,21 @@
 package com.towhid.hadis.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.towhid.hadis.R
-import com.towhid.hadis.adapter.RecyclerAdapterHadisChapter
 import com.towhid.hadis.adapter.RecyclerAdapterHadisList
 import com.towhid.hadis.databinding.FragmentHadisListBinding
-import com.towhid.hadis.model.HadisChapter
 import com.towhid.hadis.model.HadisList
-import com.towhid.hadis.network.model.response.hadis_chapter.HadisChapterRes
 import com.towhid.hadis.network.model.response.hadis_list.HadisListRes
 import com.towhid.hadis.viewModel.HadisBookViewModel
-import kotlinx.android.synthetic.main.fragment_hadis_chapter.view.*
-import kotlinx.android.synthetic.main.fragment_hadis_list.view.*
 
 private const val COLLECTION_NAME = "collectionName"
 private const val BOOK_NUMBER = "bookNumber"
@@ -31,8 +27,13 @@ class HadisListFragment : Fragment() {
     private lateinit var binding: FragmentHadisListBinding
     private lateinit var hadisBookViewModel: HadisBookViewModel
     lateinit var recyclerAdapterHadisList: RecyclerAdapterHadisList
+    lateinit var linearLayoutManager: LinearLayoutManager
     private var isAlreadyLoaded = false
-
+    private var loading = true
+    private var pageNumber = 1
+    private var pastVisibleItems = 0
+    private var visibleItemCount: Int = 0
+    private var totalItemCount: Int = 0
     private var hadisLists = mutableListOf<HadisList>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,20 +62,36 @@ class HadisListFragment : Fragment() {
     private fun init() {
         hadisBookViewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
         recyclerAdapterHadisList = RecyclerAdapterHadisList(requireContext(), hadisLists)
+        linearLayoutManager = LinearLayoutManager(context)
     }
 
     private fun action() {
         binding.recHadisList.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = linearLayoutManager
             adapter = recyclerAdapterHadisList
         }
-
+        binding.recHadisList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0) {
+                    visibleItemCount = linearLayoutManager.getChildCount()
+                    totalItemCount = linearLayoutManager.getItemCount()
+                    pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition()
+                    if (!loading) {
+                        if (visibleItemCount + pastVisibleItems >= totalItemCount - 20) {
+                            loading = true
+                            listLoad()
+                        }
+                    }
+                }
+            }
+        })
         listLoad()
     }
 
+
     private fun listLoad() {
         with(hadisBookViewModel) {
-            callHadisList(collectionName!!, bookNumber!!).observe(
+            callHadisList(collectionName!!, bookNumber!!, pageNumber).observe(
                 activity as LifecycleOwner, { any ->
                     if (any is HadisListRes) {
                         any.data.forEach {
@@ -96,10 +113,18 @@ class HadisListFragment : Fragment() {
                             )
                         }
                         recyclerAdapterHadisList.notifyDataSetChanged()
+                        pageNumber++
+                        loading = false
+
                     }
+                    else if(any is Throwable){
+                        loading = false
+                    }
+
                 })
         }
     }
+
 
     companion object {
         @JvmStatic

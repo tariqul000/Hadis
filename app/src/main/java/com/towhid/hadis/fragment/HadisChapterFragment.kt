@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.towhid.hadis.R
 import com.towhid.hadis.adapter.RecyclerAdapterHadisChapter
 import com.towhid.hadis.databinding.FragmentHadisChapterBinding
@@ -25,8 +26,13 @@ class HadisChapterFragment : Fragment() {
     private lateinit var binding: FragmentHadisChapterBinding
     private lateinit var hadisBookViewModel: HadisBookViewModel
     lateinit var recyclerAdapterHadisChapter: RecyclerAdapterHadisChapter
+    lateinit var linearLayoutManager: LinearLayoutManager
     private var isAlreadyLoaded = false
-
+    private var loading = true
+    private var pageNumber = 1
+    private var pastVisibleItems = 0
+    private var visibleItemCount: Int = 0
+    private var totalItemCount: Int = 0
     private var hadisChapters = mutableListOf<HadisChapter>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +60,7 @@ class HadisChapterFragment : Fragment() {
     private fun init() {
         hadisBookViewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
         recyclerAdapterHadisChapter = RecyclerAdapterHadisChapter(requireContext(), hadisChapters)
+        linearLayoutManager = LinearLayoutManager(context)
     }
 
     private fun action() {
@@ -61,12 +68,27 @@ class HadisChapterFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = recyclerAdapterHadisChapter
         }
+        binding.recHadisChapter.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0) {
+                    visibleItemCount = linearLayoutManager.getChildCount()
+                    totalItemCount = linearLayoutManager.getItemCount()
+                    pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition()
+                    if (!loading) {
+                        if (visibleItemCount + pastVisibleItems >= totalItemCount - 20) {
+                            loading = true
+                            chapterLoad()
+                        }
+                    }
+                }
+            }
+        })
         chapterLoad()
     }
 
     private fun chapterLoad() {
         with(hadisBookViewModel) {
-            callHadisChapter(collectionName!!).observe(
+            callHadisChapter(collectionName!!,pageNumber).observe(
                 activity as LifecycleOwner, { any ->
                     if (any is HadisChapterRes) {
                         any.data.forEach {
@@ -91,6 +113,10 @@ class HadisChapterFragment : Fragment() {
                             )
                         }
                         recyclerAdapterHadisChapter.notifyDataSetChanged()
+                        pageNumber++
+                        loading = false
+                    } else if (any is Throwable) {
+                        loading = false
                     }
                 })
         }
