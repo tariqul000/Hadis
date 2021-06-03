@@ -1,7 +1,6 @@
 package com.towhid.hadis.fragment
 
 import android.os.Bundle
-import android.text.Html
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,19 +10,21 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import com.towhid.hadis.R
 import com.towhid.hadis.network.model.response.hadis_details.HadisDetailRes
-import com.towhid.hadis.viewModel.HadisBookViewModel
+import com.towhid.hadis.viewModel.HadisViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_hadis_details.view.*
 import javax.inject.Inject
 
 private const val COLLECTION_NAME = "collectionName"
 private const val HADITH_NUMBER = "hadithNumber"
 
+
 class HadisDetailsFragment : Fragment() {
     private var collectionName: String? = null
     private var hadithNumber: String? = null
 
     @Inject
-    lateinit var hadisBookViewModel: HadisBookViewModel
+    lateinit var hadisViewModel: HadisViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +45,7 @@ class HadisDetailsFragment : Fragment() {
     }
 
     private fun init() {
-        hadisBookViewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
+        hadisViewModel = ViewModelProvider(this)[HadisViewModel::class.java]
     }
 
     private fun action(view: View) {
@@ -52,7 +53,7 @@ class HadisDetailsFragment : Fragment() {
     }
 
     private fun detailsLoad(view: View) {
-        with(hadisBookViewModel) {
+        with(hadisViewModel) {
             callHadisDetail(collectionName!!, hadithNumber!!).observe(
                 activity as LifecycleOwner, { any ->
                     if (any is HadisDetailRes) {

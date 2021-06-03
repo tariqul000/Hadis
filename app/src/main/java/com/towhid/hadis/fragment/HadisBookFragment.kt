@@ -5,107 +5,95 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
 import com.towhid.hadis.R
-import com.towhid.hadis.adapter.RecyclerAdapterHadisBook
-import com.towhid.hadis.databinding.FragmentHadisBookBinding
+import com.towhid.hadis.adapter.RecylerPagingAdapter
 import com.towhid.hadis.listener.HadisClickListener
-import com.towhid.hadis.model.HadisBook
-import com.towhid.hadis.network.model.response.hadis_book.HadisBookRes
 import com.towhid.hadis.viewModel.HadisBookViewModel
+import com.towhid.hadis.viewModel.HadisViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_hadis_book.view.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-
+@AndroidEntryPoint
 class HadisBookFragment : Fragment() {
-
-    private lateinit var binding: FragmentHadisBookBinding
-    private lateinit var hadisBookViewModel: HadisBookViewModel
-    private lateinit var recyclerAdapterHadisBook: RecyclerAdapterHadisBook
+    //private val viewModel by viewModels<HadisBookViewModel>()
+    private lateinit var viewModel: HadisBookViewModel
+    private lateinit var newsPagingAdapter: RecylerPagingAdapter
     private var isAlreadyLoaded = false
-
-    private var data = mutableListOf<HadisBook>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
+
+        return inflater.inflate(R.layout.fragment_hadis_book, container, false)
+    }
+
+    /* override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+         if (!isAlreadyLoaded) {
+             isAlreadyLoaded = true
+             viewModel.list.observe(viewLifecycleOwner) {
+                 newsPagingAdapter.submitData(lifecycle, it)
+             }
+             newsPagingAdapter.addLoadStateListener { state ->
+                 when (state.refresh) {
+                     is LoadState.Loading -> {
+                         view.book_progress.visibility = View.VISIBLE
+                     }
+                     is LoadState.NotLoading -> {
+                         view.book_progress.visibility = View.GONE
+                     }
+                     is LoadState.Error -> {
+                         view.book_progress.visibility = View.GONE
+                         Toast.makeText(requireContext(), "No Internet", Toast.LENGTH_SHORT).show()
+                     }
+
+                 }
+             }
+             view.rec_hadis_book.adapter = newsPagingAdapter
+         }
+     }*/
+    @ExperimentalPagingApi
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (!isAlreadyLoaded) {
             isAlreadyLoaded = true
-            binding =
-                DataBindingUtil.inflate(inflater, R.layout.fragment_hadis_book, container, false)
-            init()
-            action()
+            viewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
+            newsPagingAdapter = RecylerPagingAdapter(viewModel)
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.pager.collectLatest {
+                    newsPagingAdapter.submitData(it)
+                }
+            }
+
         }
-        return binding.root
+        view.rec_hadis_book.adapter = newsPagingAdapter
     }
-
-    private fun init() {
-        hadisBookViewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
-        recyclerAdapterHadisBook = RecyclerAdapterHadisBook(hadisBookViewModel, data)
-
-
-    }
-
-    private fun action() {
-        binding.recHadisBook.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = recyclerAdapterHadisBook
-        }
-        loadBooks()
-    }
-
-    private fun loadBooks() {
-        with(hadisBookViewModel) {
-            callHadisBook().observe(
-                activity as LifecycleOwner, { any ->
-                    if (any is HadisBookRes) {
-                        var no = 0
-                        any.data.forEach { it ->
-                            var enName = ""
-                            var arName = ""
-                            it.collection.forEach {
-                                when (it.lang) {
-                                    "en" -> enName = it.title
-                                    "ar" -> arName = it.title
-                                }
-                            }
-                            data.add(
-                                HadisBook(
-                                    ++no,
-                                    it.name,
-                                    it.hasBooks,
-                                    it.hasChapters,
-                                    enName,
-                                    arName,
-                                    it.totalHadith,
-                                    it.totalAvailableHadith
-                                )
-                            )
-                        }
-                        recyclerAdapterHadisBook.notifyDataSetChanged()
-                    }
-                })
-        }
-    }
-
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun hadisClickResponse(hadis: HadisClickListener) {
+    fun onMessageEvent(hadis: HadisClickListener) {
         hadis.hadisBook
         if (hadis.hadisBook.hasBooks) {
             if (hadis.hadisBook.hasChapters) {
-                val bundle = bundleOf("collectionName" to hadis.hadisBook.name)
-                Navigation.findNavController(this.context as Activity, R.id.navHostMainFragment)
-                    .navigate(R.id.action_hadisBookFragment_to_hadisChapterFragment, bundle)
+                findNavController().navigate(
+                    R.id.action_hadisBookFragment_to_hadisChapterFragment,
+                    bundleOf("collectionName" to hadis.hadisBook.name)
+                )
             }
         }
     }
@@ -119,5 +107,4 @@ class HadisBookFragment : Fragment() {
         super.onStop()
         EventBus.getDefault().unregister(this)
     }
-
 }

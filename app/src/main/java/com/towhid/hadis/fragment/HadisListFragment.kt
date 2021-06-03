@@ -15,17 +15,19 @@ import com.towhid.hadis.adapter.RecyclerAdapterHadisList
 import com.towhid.hadis.databinding.FragmentHadisListBinding
 import com.towhid.hadis.model.HadisList
 import com.towhid.hadis.network.model.response.hadis_list.HadisListRes
-import com.towhid.hadis.viewModel.HadisBookViewModel
+import com.towhid.hadis.viewModel.HadisViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val COLLECTION_NAME = "collectionName"
 private const val BOOK_NUMBER = "bookNumber"
+
 
 class HadisListFragment : Fragment() {
     private var collectionName: String? = null
     private var bookNumber: String? = null
 
     private lateinit var binding: FragmentHadisListBinding
-    private lateinit var hadisBookViewModel: HadisBookViewModel
+    private lateinit var hadisViewModel: HadisViewModel
     lateinit var recyclerAdapterHadisList: RecyclerAdapterHadisList
     lateinit var linearLayoutManager: LinearLayoutManager
     private var isAlreadyLoaded = false
@@ -60,7 +62,7 @@ class HadisListFragment : Fragment() {
     }
 
     private fun init() {
-        hadisBookViewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
+        hadisViewModel = ViewModelProvider(this)[HadisViewModel::class.java]
         recyclerAdapterHadisList = RecyclerAdapterHadisList(requireContext(), hadisLists)
         linearLayoutManager = LinearLayoutManager(context)
     }
@@ -90,7 +92,7 @@ class HadisListFragment : Fragment() {
 
 
     private fun listLoad() {
-        with(hadisBookViewModel) {
+        with(hadisViewModel) {
             callHadisList(collectionName!!, bookNumber!!, pageNumber).observe(
                 activity as LifecycleOwner, { any ->
                     if (any is HadisListRes) {

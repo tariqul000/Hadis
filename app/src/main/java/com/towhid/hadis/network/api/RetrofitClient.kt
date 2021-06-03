@@ -1,5 +1,6 @@
 package com.towhid.hadis.network.api
 
+import com.towhid.hadis.Constants.API_KEY
 import com.towhid.hadis.ServerInfo
 import com.towhid.hadis.application.Hadis
 import okhttp3.*
@@ -103,7 +104,7 @@ class RetrofitClient {
 
             var request: Request = chain.request().newBuilder().also {
                 it.addHeader("Content-Type", "application/json")
-                it.addHeader("X-API-Key", "SqD712P3E82xnwOAEOkGd5JZH8s9wRR24TqNFzjk")
+                it.addHeader("X-API-Key", API_KEY)
             }.build()
 
             if (!isConnected()) {

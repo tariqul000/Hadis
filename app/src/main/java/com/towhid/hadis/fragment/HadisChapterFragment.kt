@@ -15,16 +15,18 @@ import com.towhid.hadis.adapter.RecyclerAdapterHadisChapter
 import com.towhid.hadis.databinding.FragmentHadisChapterBinding
 import com.towhid.hadis.model.HadisChapter
 import com.towhid.hadis.network.model.response.hadis_chapter.HadisChapterRes
-import com.towhid.hadis.viewModel.HadisBookViewModel
+import com.towhid.hadis.viewModel.HadisViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_hadis_chapter.view.*
 
 private const val COLLECTION_NAME = "collectionName"
+
 
 class HadisChapterFragment : Fragment() {
     private var collectionName: String? = null
 
     private lateinit var binding: FragmentHadisChapterBinding
-    private lateinit var hadisBookViewModel: HadisBookViewModel
+    private lateinit var hadisViewModel: HadisViewModel
     lateinit var recyclerAdapterHadisChapter: RecyclerAdapterHadisChapter
     lateinit var linearLayoutManager: LinearLayoutManager
     private var isAlreadyLoaded = false
@@ -58,7 +60,7 @@ class HadisChapterFragment : Fragment() {
     }
 
     private fun init() {
-        hadisBookViewModel = ViewModelProvider(this)[HadisBookViewModel::class.java]
+        hadisViewModel = ViewModelProvider(this)[HadisViewModel::class.java]
         recyclerAdapterHadisChapter = RecyclerAdapterHadisChapter(requireContext(), hadisChapters)
         linearLayoutManager = LinearLayoutManager(context)
     }
@@ -87,7 +89,7 @@ class HadisChapterFragment : Fragment() {
     }
 
     private fun chapterLoad() {
-        with(hadisBookViewModel) {
+        with(hadisViewModel) {
             callHadisChapter(collectionName!!,pageNumber).observe(
                 activity as LifecycleOwner, { any ->
                     if (any is HadisChapterRes) {

@@ -10,13 +10,6 @@ import retrofit2.http.*
 
 interface Api {
 
-    @GET("collections")
-    fun HadisBookRes_(
-        @Query("page") page: Int? = 1,
-        @Query("limit") limit: Int? =50
-    ): Call<HadisBookRes>
-
-
     @GET("collections/{collectionName}/books")
     fun HadisChapterRes_(
         @Path("collectionName") collectionName: String,

@@ -1,119 +1,43 @@
 package com.towhid.hadis.viewModel
 
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.towhid.hadis.BookRepository
 import com.towhid.hadis.listener.HadisClickListener
 import com.towhid.hadis.model.HadisBook
-import com.towhid.hadis.network.api.RetrofitClient
-import com.towhid.hadis.network.model.response.hadis_book.HadisBookRes
-import com.towhid.hadis.network.model.response.hadis_chapter.HadisChapterRes
-import com.towhid.hadis.network.model.response.hadis_details.HadisDetailRes
-import com.towhid.hadis.network.model.response.hadis_list.HadisListRes
+import com.towhid.hadis.network.api.BookInterface
+import com.towhid.hadis.network.model.response.hadis_book.Datum
+import com.towhid.hadis.paging.BookRemoteMediator
+import com.towhid.hadis.room.BookDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.greenrobot.eventbus.EventBus
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class HadisBookViewModel @Inject constructor() : ViewModel() {
+class HadisBookViewModel @Inject constructor(
+    private val bookRepository: BookRepository, private val bookDao: BookDao,
+    private val bookInterface: BookInterface
+) : ViewModel() {
+    var list: LiveData<PagingData<Datum>> = bookRepository.getAllBookStream()
 
-    fun callHadisBook(): MutableLiveData<Any> {
-        val resultLiveData: MutableLiveData<Any> = MutableLiveData()
-        val call: Call<HadisBookRes> = RetrofitClient.getInstance().getApi().HadisBookRes_(
-        )
+    @ExperimentalPagingApi
+    val pager = Pager(
+        PagingConfig(pageSize = 10),
+        remoteMediator = BookRemoteMediator(bookDao, bookInterface, 1)
+    ) {
+        bookDao.getAllBooks()
+    }.flow
 
-        call.enqueue(object : Callback<HadisBookRes> {
-            override fun onResponse(call: Call<HadisBookRes>, response: Response<HadisBookRes>) {
-                if (response.isSuccessful) {
-                    resultLiveData.value = response.body()
-
-                }
-
-            }
-
-            override fun onFailure(call: Call<HadisBookRes>, t: Throwable) {
-                resultLiveData.value = t
-            }
-        })
-        return resultLiveData
-    }
-
-    fun callHadisChapter(collectionName: String,pageNumber: Int): MutableLiveData<Any> {
-        val resultLiveData: MutableLiveData<Any> = MutableLiveData()
-        val call: Call<HadisChapterRes> =
-            RetrofitClient.getInstance().getApi().HadisChapterRes_(collectionName,pageNumber)
-
-        call.enqueue(object : Callback<HadisChapterRes> {
-            override fun onResponse(
-                call: Call<HadisChapterRes>,
-                response: Response<HadisChapterRes>
-            ) {
-                if (response.isSuccessful) {
-                    resultLiveData.value = response.body()
-                }
-
-            }
-
-            override fun onFailure(call: Call<HadisChapterRes>, t: Throwable) {
-                resultLiveData.value = t
-            }
-        })
-        return resultLiveData
-    }
-
-    fun callHadisList(
-        collectionName: String,
-        bookNumber: String,
-        pageNumber: Int
-    ): MutableLiveData<Any> {
-        val resultLiveData: MutableLiveData<Any> = MutableLiveData()
-        val call: Call<HadisListRes> =
-            RetrofitClient.getInstance().getApi()
-                .HadisListRes_(collectionName, bookNumber, pageNumber)
-
-        call.enqueue(object : Callback<HadisListRes> {
-            override fun onResponse(
-                call: Call<HadisListRes>,
-                response: Response<HadisListRes>
-            ) {
-                if (response.isSuccessful) {
-                    resultLiveData.value = response.body()
-                }
-            }
-
-            override fun onFailure(call: Call<HadisListRes>, t: Throwable) {
-                resultLiveData.value = t
-            }
-        })
-        return resultLiveData
-    }
-
-    fun callHadisDetail(collectionName: String, hadithNumber: String): MutableLiveData<Any> {
-        val resultLiveData: MutableLiveData<Any> = MutableLiveData()
-        val call: Call<HadisDetailRes> =
-            RetrofitClient.getInstance().getApi().HadisDetailRes_(collectionName, hadithNumber)
-
-        call.enqueue(object : Callback<HadisDetailRes> {
-            override fun onResponse(
-                call: Call<HadisDetailRes>,
-                response: Response<HadisDetailRes>
-            ) {
-                if (response.isSuccessful) {
-                    resultLiveData.value = response.body()
-                }
-            }
-
-            override fun onFailure(call: Call<HadisDetailRes>, t: Throwable) {
-                resultLiveData.value = t
-            }
-        })
-        return resultLiveData
-    }
 
     fun clickHadisBook(hadisBook: HadisBook) {
+        Log.d("click","click")
         EventBus.getDefault().post(HadisClickListener(hadisBook))
     }
+
 
 }
